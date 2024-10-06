@@ -1,53 +1,42 @@
-// Word Break Medium
-// Given a string A and a dictionary of n words B, find out if A can be segmented into a space-separated sequence of dictionary words.
-// Note: From the dictionary B each word can be taken any number of times and in any order.
-
-
 #include <bits/stdc++.h>
 using namespace std;
 
-class Solution
-{
+class Solution {
 public:
     int wordBreak(string A, vector<string> &B) {
-        unordered_map<string, int> dypr;
+        unordered_set<string> dict(B.begin(), B.end());  // Convert vector to set for O(1) lookups
         int len = A.length();
-        if(len == 0) return 1;
-        if(dypr[A] !=0) return dypr[A];
-        
-        for(int i=1; i<=len;i++){
-            int flag =0;
-            string str = A.substr(0,i);
-            for(int j=0; j<B.size();j++){
-                
-                if(str.compare(B[j]) == 0){
-                    flag =1; break;
+        vector<bool> dp(len + 1, false);
+        dp[0] = true;  // Base case: empty string can always be segmented
+
+        for (int i = 1; i <= len; i++) {
+            for (int j = 0; j < i; j++) {
+                // If substring A[j:i] is in the dictionary and A[0:j] can be segmented
+                if (dp[j] && dict.find(A.substr(j, i - j)) != dict.end()) {
+                    dp[i] = true;
+                    break;  // No need to check further
                 }
             }
-                if(flag == 1 and wordBreak(A.substr(i, len-i), B) == 1) return dypr[A]=1;
-            }
-            return dypr[A]= 0;
-       
+        }
+        
+        return dp[len] ? 1 : 0;  // Return 1 if the entire string can be segmented, otherwise 0
     }
 };
 
-
-
-int main(){
+int main() {
     int t;
-    cin>>t;
-    while(t--){
+    cin >> t;
+    while (t--) {
         int n;
-        cin>>n;
-        vector<string> dict;
-        for(int i=0;i<n;i++){
-            string S;
-            cin>>S;
-            dict.push_back(S);
+        cin >> n;
+        vector<string> dict(n);
+        for (int i = 0; i < n; i++) {
+            cin >> dict[i];
         }
         string line;
-        cin>>line;
+        cin >> line;
         Solution ob;
-        cout<<ob.wordBreak(line, dict)<<"\n";
+        cout << ob.wordBreak(line, dict) << "\n";
     }
+    return 0;
 }
